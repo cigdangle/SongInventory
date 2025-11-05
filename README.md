@@ -16,4 +16,5 @@ Open the script in PowerShell ISE (you will not need elevated privledges to modi
 * **$excelOutputPath**  
 
 ## 3. Execute the script
-Run the script an enjoy the output
+Run the script an enjoy the output  
+_All info is read from the **song.ini** in each song subfolder._
