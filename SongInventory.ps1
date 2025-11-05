@@ -1,6 +1,13 @@
-﻿# Change these values as needed. Set the directory to search and the output file path
+# Change these values as needed. Set the directory to search and the output file path
 $songDirectory = "E:\Clone Hero Assets\Songs"
 $outputExcelFile = "E:\Clone Hero Assets\SongData.xlsx"
+
+# If output file already exists, delete it in prepreation for a new one
+if (Test-Path -Path $outputExcelFile) {
+    Remove-Item -Path $outputExcelFile -Force
+    Write-Host "File '$outputExcelFile' removed successfully."
+}
+
 
 # This array will store all the custom objects created from the .ini files.
 $songDataCollection = @()
@@ -62,6 +69,16 @@ foreach ($file in $iniFiles) {
 # Export the final collection of objects to an Excel file.
 # The `-AutoSize` parameter automatically adjusts column widths for better readability, and TableStyle makes it pretty!
 $sortedSongData = $songDataCollection | Sort-Object -Property Artist
-$sortedSongData| Select-Object Artist, Title, Album, Year, Genre, Guitar, Bass, Vocals, Drums, Keys | Export-Excel -Path $outputExcelFile -WorksheetName "Song Data" -AutoSize -TableStyle:'Medium2'-Show
-
+$sortedSongData| Select-Object Artist, Title, Album, Year, Genre, Guitar, Bass, Vocals, Drums, Keys | Export-Excel -Path $outputExcelFile -WorksheetName "Song Data" -AutoSize -TableStyle:'Medium2'-Show -CellStyleSB {
+    param($workSheet)
+    # Align Artist, Title, and Album left
+    $workSheet.Cells["A:C"].Style.HorizontalAlignment = "Left"
+    # Align Year (except the header) right
+    $workSheet.Cells["D2:D"].Style.HorizontalAlignment = "Right"
+    # Align Genre left
+    $workSheet.Cells["E:E"].Style.HorizontalAlignment = "Left"
+    # Align instrument difficulties center
+    $workSheet.Cells["F:J"].Style.HorizontalAlignment = "Center"
+}
+# Acknowledge file created
 Write-Host "Successfully exported data to $outputExcelFile"
