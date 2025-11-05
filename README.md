@@ -12,8 +12,8 @@ Install-Module -Name ImportExcel -Scope CurrentUser
 
 ## 2. Modify the Script
 Open the script in PowerShell ISE (you will not need elevated privledges to modify or execute the script), modify the following variables:  
-* **$rootDir**  
-* **$excelOutputPath**  
+* **$songDirectory**  
+* **$outputExcelFile**  
 
 ## 3. Execute the script
 Run the script an enjoy the output  
