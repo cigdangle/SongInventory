@@ -1,6 +1,11 @@
 # Requires the ImportExcel module. Install with:
 # Install-Module -Name ImportExcel -Scope CurrentUser
 
+#Edit the following variables
+$songDirectory = "E:\Clone Hero Assets\Songs" # <--- Change this to your starting directory
+$outputExcelFile = "E:\Clone Hero Assets\Song_Data.xlsx"   # <--- Change this to your desired output path
+
+
 function Parse-SongIni ($filePath) {
     $data = @{
         Name    = $null
@@ -91,22 +96,20 @@ function Parse-SongsDta ($filePath) {
 }
 
 # --- Main Script ---
-$startDirectory = "E:\Clone Hero Assets\Songs" # <--- Change this to your starting directory
-$outputFile = "E:\Clone Hero Assets\Song_Data.xlsx"   # <--- Change this to your desired output path
 
 # Check if the output directory exists, create if not
-$outputDir = Split-Path -Path $outputFile -Parent
+$outputDir = Split-Path -Path $outputExcelFile -Parent
 if (-not (Test-Path -Path $outputDir)) {
     New-Item -Path $outputDir -ItemType Directory | Out-Null
 }
 
 # If output file already exists, delete it in prepreation for a new one
-if (Test-Path -Path $outputFile) {
-    Remove-Item -Path $outputFile -Force
-    Write-Host "File '$outputFile' removed successfully."
+if (Test-Path -Path $outputExcelFile) {
+    Remove-Item -Path $outputExcelFile -Force
+    Write-Host "File '$outputExcelFile' removed successfully."
 }
 
-$foundFiles = Get-ChildItem -Path $startDirectory -Recurse -File | Where-Object { $_.Name -eq 'song.ini' -or $_.Name -eq 'songs.dta' }
+$foundFiles = Get-ChildItem -Path $songDirectory -Recurse -File | Where-Object { $_.Name -eq 'song.ini' -or $_.Name -eq 'songs.dta' }
 
 $allSongData = foreach ($file in $foundFiles) {
     if ($file.Name -eq 'song.ini') {
@@ -120,8 +123,8 @@ $allSongData = foreach ($file in $foundFiles) {
 
 if ($allSongData) {
     # Export to Excel spreadsheet
-    $allSongData | Export-Excel -Path $outputFile  -AutoSize -TableStyle:'Medium2'-Show 
-    Write-Host "Successfully exported data to $outputFile" -ForegroundColor Green
+    $allSongData | Export-Excel -Path $outputExcelFile  -AutoSize -TableStyle:'Medium2'-Show 
+    Write-Host "Successfully exported data to $outputExcelFile" -ForegroundColor Green
 } else {
-    Write-Host "No song.ini or songs.dta files found in $startDirectory." -ForegroundColor Yellow
+    Write-Host "No song.ini or songs.dta files found in $songDirectory." -ForegroundColor Yellow
 }
