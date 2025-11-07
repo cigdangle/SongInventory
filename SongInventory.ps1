@@ -2,8 +2,8 @@
 # Install-Module -Name ImportExcel -Scope CurrentUser
 
 #Edit the following variables
-$songDirectory = "E:\Clone Hero Assets\Songs" # <--- Change this to your starting directory
-$outputExcelFile = "E:\Clone Hero Assets\Song_Data.xlsx"   # <--- Change this to your desired output path
+$songDirectory = "C:\Users\cigda_jlxjj1h\OneDrive\Desktop\Data" # <--- Change this to your starting directory
+$outputExcelFile = "C:\Users\cigda_jlxjj1h\OneDrive\Desktop\Song_Data.xlsx"   # <--- Change this to your desired output path
 
 
 function Parse-SongIni ($filePath) {
@@ -30,13 +30,13 @@ function Parse-SongIni ($filePath) {
         # Check for instrument difficulty keys to determine presence
         '^diff_guitar\s*=\s*(.*)'  { $data.Guitar = $matches[1] }
         '^diff_vocals\s*=\s*(.*)'  { $data.Vocals = $matches[1] }
-        '^diff_drums\s*=\s*(.*)'   { $data.Drums = $matches[1] }
+        '^diff_drums\s*=\s*(.*)'   { $data.Drum = $matches[1] }
         '^diff_bass\s*=\s*(.*)'    { $data.Bass = $matches[1] }
         '^diff_keys\s*=\s*(.*)'    { $data.Keys = $matches[1] }
     }
     # If no diff keys are found, check for the 'frets' or 'pro_drums' key which often implies presence
     if (-not $data.Guitar -and (Get-Content $filePath | Select-String -Pattern '^frets\s*=')) {$data.Guitar = "Yes"}
-    if (-not $data.Drums -and (Get-Content $filePath | Select-String -Pattern '^pro_drums\s*=')) {$data.Drums = "Yes"}
+    if (-not $data.Drum -and (Get-Content $filePath | Select-String -Pattern '^pro_drums\s*=')) {$data.Drum = "Yes"}
 
     return New-Object PSObject -Property $data
 }
@@ -80,18 +80,25 @@ function Parse-SongsDta ($filePath) {
         $data.Year = $matches[1]
     }
 
-    # Check for instrument presence in the 'rank' section
-    #if ($content -match "(?s)\('rank'(.*?)\)\s*\('genre'")  {
-    #    $rank = $matches[1].Trim()
-    #    Write-Host "match"
-        if ($content -match "'rank'\s*\((?:[^)]*?\s*'guitar'\s*(\d+)|[^)]*)\)") { $data.Guitar = $matches[1]}
-        #if ($tracks -match 'guitar''?\s*\(([\d\s-]+)\)') { $data.Guitar = "poop" }
-        if ($rank -match 'vocals') { $data.Vocals = "Yes" }
-        if ($rank -match 'drum') { $data.Drums = "Yes" }
-        if ($rank -match 'bass') { $data.Bass = "Yes" }
-        if ($rank -match 'keys') { $data.Keys = "Yes" }
-    #}
+# Instruments to extract
+$instruments = @('drum', 'guitar', 'bass', 'vocals', 'keys')
 
+foreach ($instrument in $instruments) {
+    # Define a simple regex pattern that captures the number using named group 'value'
+    # This specifically targets the format ('instrument' number)
+    $regexPattern = "^\s*\('$instrument'\s+(?<value>\d+)\)"
+
+    # Iterate line by line to find the match within the file content
+    $value = $null
+    foreach ($line in $content -split "`n") {
+        if ($line -match $regexPattern) {
+            # If the line matches, the value is captured in the $Matches hashtable under the group name 'value'
+            $value = $Matches['value']
+            Write-Host $value
+            $data.$instrument = $value
+        }
+    }
+}
     return New-Object PSObject -Property $data
 }
 
@@ -114,10 +121,10 @@ $foundFiles = Get-ChildItem -Path $songDirectory -Recurse -File | Where-Object {
 $allSongData = foreach ($file in $foundFiles) {
     if ($file.Name -eq 'song.ini') {
         Write-Host "Parsing INI file: $($file.FullName)"
-        Parse-SongIni -filePath $file.FullName | Select-Object Name, Artist, Album, Genre, Year, Guitar, Vocals, Drums, Bass, Keys
+        Parse-SongIni -filePath $file.FullName | Select-Object Name, Artist, Album, Genre, Year, Guitar, Vocals, Drum, Bass, Keys
     } elseif ($file.Name -eq 'songs.dta') {
         Write-Host "Parsing DTA file: $($file.FullName)"
-        Parse-SongsDta -filePath $file.FullName | Select-Object Name, Artist, Album, Genre, Year, Guitar, Vocals, Drums, Bass, Keys
+        Parse-SongsDta -filePath $file.FullName | Select-Object Name, Artist, Album, Genre, Year, Guitar, Vocals, Drum, Bass, Keys
     }
 }
 
