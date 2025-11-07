@@ -2,8 +2,8 @@
 # Install-Module -Name ImportExcel -Scope CurrentUser
 
 #Edit the following variables
-$songDirectory = "C:\Songs\Data" # <--- Change this to your starting directory
-$outputExcelFile = "C:\Songs\Song_Data.xlsx"   # <--- Change this to your desired output path
+$songDirectory = "E:\Clone Hero Assets\Songs" # <--- Change this to your starting directory
+$outputExcelFile = "E:\Clone Hero Assets\Song_Data.xlsx"   # <--- Change this to your desired output path
 
 
 function Parse-SongIni ($filePath) {
@@ -94,7 +94,6 @@ foreach ($instrument in $instruments) {
         if ($line -match $regexPattern) {
             # If the line matches, the value is captured in the $Matches hashtable under the group name 'value'
             $value = $Matches['value']
-            Write-Host $value
             $data.$instrument = $value
         }
     }
@@ -133,7 +132,15 @@ if ($allSongData) {
     $sortedSongData = $allSongData | Sort-Object -Property Artist, Name
     
     # Export to Excel spreadsheet
-    $sortedSongData | Export-Excel -Path $outputExcelFile  -AutoSize -TableStyle:'Medium2'-Show 
+    $sortedSongData | Export-Excel -Path $outputExcelFile  -AutoSize -TableStyle:'Medium2'-Show -CellStyleSB {
+        param($worksheet)
+
+        # Left-align cells in columns A thru D
+        $worksheet.Cells["A:D"].Style.HorizontalAlignment = "Left"
+
+        # Center-align all cells in columns E thru J
+        $worksheet.Cells["E:J"].Style.HorizontalAlignment = "Center"
+}
     Write-Host "Successfully exported data to $outputExcelFile" -ForegroundColor Green
 } else {
     Write-Host "No song.ini or songs.dta files found in $songDirectory." -ForegroundColor Yellow
