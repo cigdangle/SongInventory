@@ -1,4 +1,5 @@
-# Requires the ImportExcel module. Install with:
+# Requires the ImportExcel module
+
 # Install-Module -Name ImportExcel -Scope CurrentUser
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -6,14 +7,14 @@ Add-Type -AssemblyName System.Windows.Forms
 $songBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
 $songBrowser.Description = "Please select your songs folder"
 $songBrowser.SelectedPath = [Environment]::GetFolderPath("Desktop") # Set initial path to My Documents
-$songDirectory = $songBrowser.ShowDialog()
+$songDirectory = $songBrowser.ShowDialog((New-Object System.Windows.Forms.Form -Property @{TopMost = $True}))
 $songDirectory = $songBrowser.SelectedPath
 
 #Select Output Path
 $outputBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
 $outputBrowser.Description = "Please select your output folder"
 $outputBrowser.SelectedPath = [Environment]::GetFolderPath("Desktop") # Set initial path to My Documents
-$outputExcelFile = $outputBrowser.ShowDialog()
+$outputExcelFile = $outputBrowser.ShowDialog((New-Object System.Windows.Forms.Form -Property @{TopMost = $True}))
 $outputExcelFile = $songBrowser.SelectedPath + "\SongData.xlsx"
 
 function Parse-SongIni ($filePath) {
