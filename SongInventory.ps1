@@ -1,10 +1,20 @@
 # Requires the ImportExcel module. Install with:
 # Install-Module -Name ImportExcel -Scope CurrentUser
+Add-Type -AssemblyName System.Windows.Forms
 
-#Edit the following variables
-$songDirectory = "E:\Clone Hero Assets\Songs" # <--- Change this to your starting directory
-$outputExcelFile = "E:\Clone Hero Assets\Song_Data.xlsx"   # <--- Change this to your desired output path
+#Select Song Path
+$songBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
+$songBrowser.Description = "Please select your songs folder"
+$songBrowser.SelectedPath = [Environment]::GetFolderPath("Desktop") # Set initial path to My Documents
+$songDirectory = $songBrowser.ShowDialog()
+$songDirectory = $songBrowser.SelectedPath
 
+#Select Output Path
+$outputBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
+$outputBrowser.Description = "Please select your output folder"
+$outputBrowser.SelectedPath = [Environment]::GetFolderPath("Desktop") # Set initial path to My Documents
+$outputExcelFile = $outputBrowser.ShowDialog()
+$outputExcelFile = $songBrowser.SelectedPath + "\SongData.xlsx"
 
 function Parse-SongIni ($filePath) {
     $data = @{
