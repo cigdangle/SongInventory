@@ -2,8 +2,8 @@
 # Install-Module -Name ImportExcel -Scope CurrentUser
 
 #Edit the following variables
-$songDirectory = "C:\Users\cigda_jlxjj1h\OneDrive\Desktop\Data" # <--- Change this to your starting directory
-$outputExcelFile = "C:\Users\cigda_jlxjj1h\OneDrive\Desktop\Song_Data.xlsx"   # <--- Change this to your desired output path
+$songDirectory = "C:\Songs\Data" # <--- Change this to your starting directory
+$outputExcelFile = "C:\Songs\Song_Data.xlsx"   # <--- Change this to your desired output path
 
 
 function Parse-SongIni ($filePath) {
@@ -129,8 +129,11 @@ $allSongData = foreach ($file in $foundFiles) {
 }
 
 if ($allSongData) {
+    # Sort Data by Artist and Song
+    $sortedSongData = $allSongData | Sort-Object -Property Artist, Name
+    
     # Export to Excel spreadsheet
-    $allSongData | Export-Excel -Path $outputExcelFile  -AutoSize -TableStyle:'Medium2'-Show 
+    $sortedSongData | Export-Excel -Path $outputExcelFile  -AutoSize -TableStyle:'Medium2'-Show 
     Write-Host "Successfully exported data to $outputExcelFile" -ForegroundColor Green
 } else {
     Write-Host "No song.ini or songs.dta files found in $songDirectory." -ForegroundColor Yellow
